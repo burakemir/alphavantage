@@ -18,6 +18,8 @@ struct Cli {
     period: String,
     #[arg(help = "Stock symbol (e.g. AAPL)")]
     symbol: String,
+    #[arg(long, action, help = "whether to show overview")]
+    overview: bool,
 }
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -29,6 +31,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let symbol = &args.symbol;
     let client = Client::new(&token);
+
+    if args.overview {
+        let overview = client.get_overview(symbol).await?;
+        println!("{:?}", overview);
+    }
 
     let tickers = client.get_tickers(symbol).await?;
     let ticker = tickers

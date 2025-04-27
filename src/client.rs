@@ -1,5 +1,6 @@
 use crate::api::{APIRequest, APIRequestBuilder};
 use crate::error::Error;
+use crate::overview;
 use crate::time_series;
 use crate::{exchange_rate, tickers};
 use std::io::Cursor;
@@ -167,6 +168,14 @@ impl Client {
         let request = self.builder.create(function.into(), &params);
         let response = self.api_call(request).await?;
         let result = time_series::parser::parse(function, response)?;
+        Ok(result)
+    }
+
+    pub async fn get_overview(&self, symbol: &str) -> Result<overview::Overview, Error> {
+        let params = vec![("symbol", symbol)];
+        let request = self.builder.create("OVERVIEW", &params);
+        let response = self.api_call(request).await?;
+        let result = overview::parser::parse(response)?;
         Ok(result)
     }
 
